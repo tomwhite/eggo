@@ -196,8 +196,9 @@ def install_eggo(path, fork, branch):
             sudo('python setup.py install')
 
 def create_users():
-    sudo('hadoop fs -mkdir -p /user/{user}'.format(user=env.user), user='hdfs')
-    sudo('hadoop fs -chown {user} /user/{user}'.format(user=env.user), user='hdfs')
+    if exec_ctx == 'director':
+        sudo('hadoop fs -mkdir -p /user/{user}'.format(user=env.user), user='hdfs')
+        sudo('hadoop fs -chown {user} /user/{user}'.format(user=env.user), user='hdfs')
 
 @task
 def setup_master():
@@ -210,11 +211,11 @@ def setup_master():
     def do():
         run('mkdir -p -m 777 {work_path}'.format(work_path=work_path))
         install_pip()
-        #install_git()
-        #install_fabric_luigi()
-        #install_maven(eggo_config.get('versions', 'maven'))
-        #install_adam(work_path, adam_fork, adam_branch)
-        #install_eggo(work_path, eggo_fork, eggo_branch)
+        install_git()
+        install_fabric_luigi()
+        install_maven(eggo_config.get('versions', 'maven'))
+        install_adam(work_path, adam_fork, adam_branch)
+        install_eggo(work_path, eggo_fork, eggo_branch)
         create_users()
         # restart Hadoop
         run('if [ -e /root/ephemeral-hdfs/bin/stop-all.sh ]; then /root/ephemeral-hdfs/bin/stop-all.sh; fi')
