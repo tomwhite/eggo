@@ -21,7 +21,8 @@ from cStringIO import StringIO
 
 from fabric.api import (
     task, env, execute, local, open_shell, put, cd, run, prefix, shell_env,
-    require, hosts, path, sudo)
+    require, hosts, path)
+from fabric.api import sudo as fabric_sudo
 from fabric.contrib.files import append
 from boto.ec2 import connect_to_region
 from boto.s3.connection import S3Connection
@@ -124,6 +125,11 @@ def deploy_config():
 
     execute(do, hosts=get_worker_hosts())
 
+def sudo(command):
+    if exec_ctx == 'director':
+        fabric_sudo(command)
+    else:
+        run(command) # spark-ec2 runs as root
 
 def install_pip():
     with cd('/tmp'):
